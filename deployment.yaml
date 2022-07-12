@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csvserver
+  labels:
+    app: csvserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csvserver
+  template:
+    metadata:
+      labels:
+        app: csvserver
+    spec:
+      containers:
+      - image: docker.io/infracloudio/csvserver:latest
+        name: csvserver
+        resources:
+          limits:
+            memory: 500Mi
+            cpu: 1000m
+          requests:
+            memory: 500Mi
+            cpu: 1000m
+        ports:
+        - containerPort: 9300
+        env:
+          - name: CSVSERVER_BORDER
+            value: Blue
+        volumeMounts:
+        - name: csvserver-input
+          mountPath: /csvserver/inputdata
+          subPath: inputdata
+      volumes:
+        - configMap:
+            name: csvserver-input
+            items:
+              - key: input
+                path: inputdata
+          name: csvserver-input
